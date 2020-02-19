@@ -8,10 +8,15 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 
+import android.os.Parcelable;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class TestAccelerometreActivity extends Activity implements SensorEventListener {
     private SensorManager sensorManager;
@@ -22,6 +27,7 @@ public class TestAccelerometreActivity extends Activity implements SensorEventLi
     private long lastUpdate;
     private float currentLux = -1;
 
+    private List<String> lightString = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,10 +53,10 @@ public class TestAccelerometreActivity extends Activity implements SensorEventLi
                         SensorManager.SENSOR_DELAY_NORMAL);*/
                 // register this class as a listener for the accelerometer sensor
 
-                view2.append("\nResolution: " + accelerometer.getResolution() + "\n");
-                view2.append("Maximum Range: " + accelerometer.getMaximumRange() + "\n");
+                view2.append("\nResolution: " + accelerometer.getResolution() + " ");
+                view2.append("Maximum Range: " + accelerometer.getMaximumRange() + " ");
                 view2.append("Power: " + accelerometer.getPower() + "\n");
-                view2.append("Min Delay: " + accelerometer.getMinDelay() + "\n");
+                view2.append("Min Delay: " + accelerometer.getMinDelay() + " ");
                 view2.append("Max Delay: " + accelerometer.getMaxDelay());
 
             } else {
@@ -141,6 +147,7 @@ public class TestAccelerometreActivity extends Activity implements SensorEventLi
                 textview.append("\nHIGH Intensity");
             }
             linearLayout.addView(textview);
+            lightString.add(textview.getText().toString());
             scrollView.post(new Runnable() {
                 @Override
                 public void run() {
@@ -154,6 +161,36 @@ public class TestAccelerometreActivity extends Activity implements SensorEventLi
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Do something here if sensor accuracy changes.
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState){
+        super.onRestoreInstanceState(savedInstanceState);
+        view2.setText(savedInstanceState.getString("k1"));
+        lightString = savedInstanceState.getStringArrayList("k2");
+        Iterator<String> iter = lightString.iterator();
+        while(iter.hasNext()) {
+            TextView view = new TextView(this);
+            view.setText(iter.next());
+            linearLayout.addView(view);
+        }
+        color = savedInstanceState.getBoolean("k3");
+        if (!color) {
+            view.setBackgroundColor(Color.GREEN);
+
+        } else {
+            view.setBackgroundColor(Color.RED);
+        }
+        currentLux = savedInstanceState.getFloat("k4");
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState){
+        outState.putString("k1", view2.getText().toString());
+        outState.putStringArrayList("k2", (ArrayList<String>) lightString);
+        outState.putBoolean("k3", color);
+        outState.putFloat("k4", currentLux);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
