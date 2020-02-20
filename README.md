@@ -1,4 +1,4 @@
-# MiniActiv1
+# MiniActiv1 - Ús de sensors
 A) Explorar el maneig de l’acceleròmetre
 
 1. Comproveu quines bones pràctiques han estat aplicades.
